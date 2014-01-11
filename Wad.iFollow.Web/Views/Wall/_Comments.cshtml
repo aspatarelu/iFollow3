@@ -1,0 +1,41 @@
+﻿@model Wad.iFollow.Web.Models.WallData
+
+<h4 class="beautifulFont" style="color: black; font-family: 'Arabic Typesetting';">Comments: </h4>
+<div id="comm-@Model.postId" style="overflow-y:scroll; height:100px; background-color:#f0cf81"></div>
+<a  class="beautifulFont" href="#" onclick="showDiv();" id="leaveComm-@Model.postId" style="color: black; font-family: 'Arabic Typesetting'";>Leave a comment</a>
+<div id="comment" hidden="hidden">
+@using (Html.BeginForm("SetComment", "Wall", FormMethod.Post, new { id = "commentForm", onsubmit = "return updateView(this);" }))
+{
+    @Html.HiddenFor(m => m.postId)
+    @Html.ValidationMessageFor(m=>m.currentComment, "You must provide a comment first")
+    @Html.TextAreaFor(m => m.currentComment, new { id = "currentComment" + @Model.postId})
+    <button id="btn-@Model.postId" type="submit" class="btn btn-primary" disabled="disabled">Add comment</button>
+}
+</div>
+<script>
+    function updateView(form) {
+        if ($(form).valid()) {
+            $.ajax({
+                url: form.action,
+                type: form.method,
+                data: $(form).serialize(),
+                success: function (result) {
+                    var userName = result.username + ' said:';
+                    var htmlString = '<div class="col-md-1"></div><p style="text-align:left; background:border-box ; background-color:#eec463; color:black; width="200px"">';
+                    var date = 'now';
+                    var final = userName + htmlString + result.message + '</p>' + date;
+
+                    $('#comm-' + result.id).append(final);
+                    $('#currentComment' + result.id).val("");
+                }
+            });
+        }
+        return false;
+    };
+    function showDiv(commid) {
+        
+        $('#comment').visible = 'visible';
+        $('#leaveComm').hide();
+        $('#comment').fadeIn('slow');
+    }
+</script>
